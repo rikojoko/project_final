@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Multi-Output Medical Assistant</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome untuk Icon Medis -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .medical-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        .card-result {
+            border-left: 5px solid #198754;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container py-5">
+        <!-- Header Dasbor -->
+        <div class="p-4 p-md-5 mb-4 text-white rounded medical-header shadow">
+            <div class="col-md-8 px-0">
+                <h1 class="display-5 fw-bold"><i class="fa-solid fa-user-md me-2"></i>AI Multi-Output Assistant</h1>
+                <p class="lead my-3">Sistem integrasi klinis bertenaga Machine Learning untuk prediksi ganda (Diagnosa & Rekomendasi Terapi) secara real-time.</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Kolom Kiri: Input Form -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm p-4">
+                    <h4 class="mb-4 text-dark"><i class="fa-solid fa-clipboard-list text-primary me-2"></i>Data Rekam Medis</h4>
+                    
+                    <form action="/analyze" method="POST">
+                        <div class="mb-3">
+                            <label for="symptom" class="form-label fw-semibold">Deskripsi Keluhan Pasien</label>
+                            <textarea class="form-control" id="symptom" name="symptom" rows="4" placeholder="Ketik gejala klinis di sini..." required>{{ inputs.symptom if inputs }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="usia" class="form-label fw-semibold">Usia Pasien</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="usia" name="usia" value="{{ inputs.usia if inputs else 25 }}" required>
+                                <span class="input-group-text">Tahun</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tekanan_darah" class="form-label fw-semibold">Tekanan Darah (Tensi)</label>
+                            <input type="text" class="form-control" id="tekanan_darah" name="tekanan_darah" value="{{ inputs.tekanan_darah if inputs else '120/80' }}" placeholder="Contoh: 120/80" required>
+                            <div class="form-text">Gunakan format standar: sistolik/diastolik</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="kadar_gula" class="form-label fw-semibold">Kadar Gula Darah</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="kadar_gula" name="kadar_gula" value="{{ inputs.kadar_gula if inputs else 100 }}" required>
+                                <span class="input-group-text">mg/dL</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold"><i class="fa-solid fa-microchip me-2"></i>Proses Multi-Output AI</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Tampilan Output AI -->
+            <div class="col-lg-7">
+                <!-- Jika Berhasil Mendapatkan Prediksi Ganda -->
+                {% if outputs %}
+                <div class="card border-0 shadow-sm p-4 card-result mb-4">
+                    <h4 class="text-success mb-3"><i class="fa-solid fa-square-poll-horizontal me-2"></i>Hasil Analisis Prediksi Ganda</h4>
+                    <hr>
+                    
+                    <!-- Output 1: Diagnosa -->
+                    <div class="mb-4">
+                        <h6 class="text-muted text-uppercase fw-bold small"><i class="fa-solid fa-stethoscope me-1"></i> Output 1: Hasil Diagnosa Medis</h6>
+                        <div class="p-3 bg-light rounded mt-2 border">
+                            <span class="badge bg-danger fs-5 py-2 px-3">{{ outputs.diagnosis }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Output 2: Terapi -->
+                    <div>
+                        <h6 class="text-muted text-uppercase fw-bold small"><i class="fa-solid fa-capsules me-1"></i> Output 2: Rekomendasi Terapi AI</h6>
+                        <div class="p-3 bg-light rounded mt-2 border">
+                            <p class="mb-0 text-dark lh-base">{{ outputs.therapy }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% elif error %}
+                <!-- Jika Terjadi Kendala Sistem -->
+                <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center" role="alert">
+                    <i class="fa-solid fa-circle-exclamation fs-4 me-3"></i>
+                    <div><strong>Gagal Komputasi:</strong> {{ error }}</div>
+                </div>
+                {% else %}
+                <!-- Tampilan Standby Saat Pertama Kali Dibuka -->
+                <div class="card border-0 shadow-sm p-5 text-center text-muted justify-content-center h-100">
+                    <div>
+                        <i class="fa-solid fa-wave-square display-4 text-black-50 mb-3 animate-pulse"></i>
+                        <h5>Menunggu Input Rekam Medis</h5>
+                        <p class="small mb-0">Isi data pasien di panel kiri lalu klik tombol proses untuk memicu Multi-Output Classifier.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
